@@ -34,18 +34,6 @@ function JwtCrafter:access(config)
     response.exit(403, '{"message":"Consumer has no JWT credential, cannot craft token"}')
   end
 
-  if totp.load_totp_key(consumer.id) then
-    local totp_code = request.get_header('x_totp')
-    if totp_code then
-      local totp_bool = totp.verify(consumer.id, totp_code)
-      if not totp_bool then
-        response.exit(403, '{"message":"Invalid TOTP code"}')
-      end
-    else  
-        response.exit(401, '{"message":"Cannot verify the identify of the consumer, TOTP code is missing"}')
-    end
-  end
-
   -- Hooray, create the token finally
   local jwt_token = jwt.encode_token(
     {
